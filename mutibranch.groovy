@@ -51,7 +51,7 @@ pipeline {
                 script {
                     // Read POM xml file using 'readMavenPom' step , this step 'readMavenPom' is included in: https://plugins.jenkins.io/pipeline-utility-steps
                     
-                    pomversion = sh(returnStdout: true,script:"sed -n '/<parent>/,/<\\/parent>/p' gameoflife-web/pom.xml| sed -ne '/<version>/p'|sed -e 's/<version>//' -e 's/<\\/version>//'").toString().trim()
+                    pomversion = sh(returnStdout: true,script:"sed -n '/<parent>/,/<\\/parent>/p' gameoflife-web/pom.xml| sed -ne '/<version>/p' | sed -e 's/<version>//g' | sed -e 's/<\/version>//g'").toString().trim()
                     
                     pom = readMavenPom file: "gameoflife-web/pom.xml";
                     // Find built artifact under target folder
@@ -64,7 +64,7 @@ pipeline {
                     artifactExists = fileExists artifactPath;
                     
                     if(artifactExists) {
-                        echo "*** File: ${artifactPath}, group: ${pom.groupId}, packaging: ${pom.packaging}, version: ${pom.version}";
+                        echo "*** File: ${artifactPath}, group: ${pom.groupId}, packaging: ${pom.packaging}, version: ${pomversion}";
                         
                         nexusArtifactUploader(
                             nexusVersion: NEXUS_VERSION,
